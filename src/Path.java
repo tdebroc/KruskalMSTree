@@ -33,13 +33,13 @@ public class Path implements Comparable<Path>{
   }
   
   public String toString() {
-    return "From " + city1.getName() + " To " + city2.getName() + " Cost " + 
+    return "From " + city1 + " To " + city2 + " Cost " + 
         weight;
   }
   
 
   @Override
   public int compareTo(Path p) {
-    return weight - p.getWeight();
+    return weight - p.getWeight() != 0 ? weight - p.getWeight() : -1;
   }
 }

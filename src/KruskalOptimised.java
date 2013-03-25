@@ -1,42 +1,22 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
 
 
-public class Kruskal {
-  SortedPathList paths = new SortedPathList();
+
+public class KruskalOptimised {
+  AllPath paths;
   HashMap<String, City> cities = new HashMap<String, City>();
   int totalWeight;
+  int cityCount;
+  int edgeCount;
   
   /**
    * Read the text file and Builds worlds !!
    * Classic implementation.
    */
   public void buildWorld(String fileName) {
-    BufferedReader br = null; 
-    try {
-      br = new BufferedReader(new FileReader(fileName));
-    } catch (FileNotFoundException e1) {
-      e1.printStackTrace();
-    }
-    String line;
-    try {
-      br.readLine(); // City count
-      br.readLine(); // Edge count
-      while ((line = br.readLine()) != null) {
-        String[] lineSplitted = line.split(" ");
-        City city1 = getCity(lineSplitted[0]);
-        City city2 = getCity(lineSplitted[1]);
-        int weight = Integer.parseInt(lineSplitted[2]);
-        paths.add(new Path(weight, city1, city2));
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    OptimisedBuildWorld.buildWorld(fileName, this);
   }
 
   
@@ -62,19 +42,32 @@ public class Kruskal {
     totalWeight = 0;
     Iterator<Path> pathIterator = paths.iterator();
     Path path;
-    while (pathIterator.hasNext()) {
+    int count = 0;
+    boolean hasNext = true;
+    // We don't use hasNext() for faster result, next() do the job for both.
+    while (hasNext) {
       path = pathIterator.next();
-      if (path.getCity1().getTree() == null
-          && path.getCity2().getTree() == null) {
-        addTwoAloneCities(path.getCity1(), path.getCity2(), path);
-      } else if (path.getCity1().getTree() == null) {
-        addOneAloneCity(path.getCity1(), path, path.getCity2().getTree());
-      } else if (path.getCity2().getTree() == null) {
-        addOneAloneCity(path.getCity2(), path, path.getCity1().getTree());
-      } else if (!path.getCity1().getTree().equals(path.getCity2().getTree())) {
-        addCitiesFromDifferentTree(path);
+      if (path != null ) {
+        count+=path.getWeight();
+        if (path.getCity1().getTree() == null
+            && path.getCity2().getTree() == null) {
+          addTwoAloneCities(path.getCity1(), path.getCity2(), path);
+        } else if (path.getCity1().getTree() == null) {
+          addOneAloneCity(path.getCity1(), path, path.getCity2().getTree());
+        } else if (path.getCity2().getTree() == null) {
+          addOneAloneCity(path.getCity2(), path, path.getCity1().getTree());
+        } else if (!path.getCity1().getTree().equals(path.getCity2().getTree())) {
+          addCitiesFromDifferentTree(path);
+        }
+        
+        if (path.getCity1().getTree().getCities().size() == cityCount ) {
+           return;
+        }
+      } else {
+        hasNext = false;
       }
     }
+    System.out.println(count);
   }
   
   /**

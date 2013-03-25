@@ -25,4 +25,8 @@ public class City {
     this.tree = tree;
   }  
   
+  public String toString() {
+    return name;
+  }
+  
 }
